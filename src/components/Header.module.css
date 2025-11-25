@@ -1,0 +1,6 @@
+.header {
+  background-color: var(--color-primary);
+}
+.logo {
+  cursor: pointer;
+}

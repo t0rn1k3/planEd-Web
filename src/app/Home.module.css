@@ -1,0 +1,52 @@
+/* Home.module.css */
+.container {
+  padding: 2rem;
+  text-align: center;
+}
+
+.title {
+  color: var(--color-primary);
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.grid {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  width: 180px;
+  height: 180px;
+  background-color: var(--color-hover);
+  color: white;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.card:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.icon {
+  font-size: 36px;
+  margin-bottom: 0.5rem;
+}
+
+.cardText {
+  font-weight: 600;
+}
+
+.cardSubtext {
+  font-size: 12px;
+  opacity: 0.8;
+}
