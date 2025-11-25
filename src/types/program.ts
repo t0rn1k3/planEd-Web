@@ -21,7 +21,7 @@ export interface CurriculumProgram {
   id: string;
   name: string;
   totalWeeks: number;
-  startDate: number;
+  startDate: string;
   holidays: string[];
   modules: Module[];
 }
