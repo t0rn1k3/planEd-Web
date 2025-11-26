@@ -1,4 +1,3 @@
-/* Home.module.css */
 .container {
   padding: 2rem;
   text-align: center;
@@ -49,4 +48,41 @@
 .cardSubtext {
   font-size: 12px;
   opacity: 0.8;
+}
+.programCard {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+}
+
+.programHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.programName {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: black;
+}
+
+.deleteProgram {
+  background: #c62828;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.addModuleButton {
+  background: var(--color-secondary);
+  color: black;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 1rem;
 }

@@ -1,0 +1,55 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modalBody {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.18);
+}
+
+.modalBody h2 {
+  font-size: 18px;
+  margin: 0 0 8px 0;
+}
+
+.modalBody input,
+.modalBody select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.modalBody button {
+  padding: 10px 14px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.modalBody button:first-of-type {
+  background: #0077ff;
+  color: #fff;
+}
+
+.modalBody button:last-of-type {
+  background: #e0e0e0;
+  color: #333;
+}

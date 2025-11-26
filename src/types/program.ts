@@ -11,10 +11,11 @@ export interface Module {
   type: ModuleType;
   contactHours: number;
   independentHours: number;
-  assesmentHours: number;
+  assessmentHours: number;
   durationWeeks: number;
   credits: number;
   startWeek: number;
+  weeklyOverrides: Record<number, number>;
 }
 
 export interface CurriculumProgram {
