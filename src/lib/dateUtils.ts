@@ -29,6 +29,14 @@ export function getWeekLabels(startDate: string, activeWeeks: number[]) {
     s.setDate(s.getDate() + i * 7);
     const e = new Date(s);
     e.setDate(s.getDate() + 6);
-    return `${s.toLocaleDateString()} - ${e.toLocaleDateString()}`;
+    const options: Intl.DateTimeFormatOptions = {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    };
+    return `${s.toLocaleDateString("ka-GE", options)} - ${e.toLocaleDateString(
+      "ka-GE",
+      options
+    )}`;
   });
 }

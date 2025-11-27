@@ -3,15 +3,15 @@
   margin-top: 1rem;
 }
 
-.moduleTable {
+.table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-.moduleTable th,
-.moduleTable td {
-  border: 1px solid #ccc;
+.table th,
+.table td {
+  border: 1px solid var(--color-hover);
   padding: 6px 8px;
   text-align: center;
   white-space: nowrap;
@@ -21,4 +21,8 @@
   width: 60px;
   padding: 4px;
   text-align: center;
+}
+.weekdays {
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
 }

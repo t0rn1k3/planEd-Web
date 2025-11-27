@@ -9,7 +9,6 @@ interface ModuleItemProps {
 }
 
 export default function ModuleItem({ module, onDelete }: ModuleItemProps) {
-  // Convert weeklyOverrides object → array in correct order
   const weeksArray: number[] = Object.values(module.weeklyOverrides || {});
 
   return (
