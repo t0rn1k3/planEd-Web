@@ -1,20 +1,26 @@
 "use client";
 
-import { useProgramStore } from "@/store/programSore";
 import { useState } from "react";
+import { useProgramStore } from "@/store/programSore";
+
 import AddProgramModal from "@/components/AddProgramModal";
 import AddModuleModal from "@/components/AddModuleModal";
 import ModuleTable from "@/components/ModuleTable";
+
 import styles from "./CurriculumPage.module.css";
 
 export default function CurriculumPage() {
   const { programs, removeProgram } = useProgramStore();
+
   const [showAddProgram, setShowAddProgram] = useState(false);
-  const [openModuleFor, setOpenModuleFor] = useState<string | null>(null);
+  const [showAddModule, setShowAddModule] = useState<null | string>(null);
 
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>სასწავლო გეგმა</h1>
+      <p className={styles.subtitle}>
+        თქვენ შეგიძლიათ დაამატოთ, შეცვალოთ ან წაშალოთ სასწავლო პროგრამები
+      </p>
 
       <button
         className={styles.addButton}
@@ -27,30 +33,41 @@ export default function CurriculumPage() {
         <AddProgramModal onClose={() => setShowAddProgram(false)} />
       )}
 
-      {openModuleFor && (
-        <AddModuleModal
-          programId={openModuleFor}
-          onClose={() => setOpenModuleFor(null)}
-        />
-      )}
-
-      {programs.length === 0 ? (
-        <p>პროგრამები არ არის დამატებული</p>
-      ) : (
-        <div className={styles.programList}>
-          {programs.map((p) => (
-            <div key={p.id} className={styles.programCard}>
+      <div className={styles.programList}>
+        {programs.length === 0 ? (
+          <p>სასწავლო პროგრამები ჯერ არ არის დამატებული.</p>
+        ) : (
+          programs.map((program) => (
+            <div key={program.id} className={styles.programCard}>
               <div className={styles.programHeader}>
-                <h2>{p.name}</h2>
-                <button onClick={() => removeProgram(p.id)}>წაშლა</button>
-                <button onClick={() => setOpenModuleFor(p.id)}>+ მოდული</button>
+                <h2 className={styles.programName}>{program.name}</h2>
+                <button
+                  className={styles.deleteProgram}
+                  onClick={() => removeProgram(program.id)}
+                >
+                  წაშლა
+                </button>
               </div>
 
-              <ModuleTable program={p} />
+              <button
+                className={styles.addModuleButton}
+                onClick={() => setShowAddModule(program.id)}
+              >
+                + მოდულის დამატება
+              </button>
+
+              {showAddModule === program.id && (
+                <AddModuleModal
+                  programId={program.id}
+                  onClose={() => setShowAddModule(null)}
+                />
+              )}
+
+              <ModuleTable program={program} />
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }
