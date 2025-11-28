@@ -45,7 +45,7 @@ export default function CurriculumPage() {
                   className={styles.deleteProgram}
                   onClick={() => removeProgram(program.id)}
                 >
-                  წაშლა
+                  პროგრამის წაშლა
                 </button>
               </div>
 

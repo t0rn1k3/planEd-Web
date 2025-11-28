@@ -9,6 +9,7 @@ interface ProgramState {
   addModule: (programId: string, module: Module) => void;
   removeModule: (programId: string, moduleId: string) => void;
   updateProgram: (program: CurriculumProgram) => void;
+  updateModule: (programId: string, updatedModule: Module) => void;
 }
 
 export const useProgramStore = create<ProgramState>((set) => ({
@@ -42,6 +43,19 @@ export const useProgramStore = create<ProgramState>((set) => ({
     set((state) => ({
       programs: state.programs.map((program) =>
         program.id === updatedProgram.id ? updatedProgram : program
+      ),
+    })),
+  updateModule: (programId: string, updatedModule: Module) =>
+    set((state) => ({
+      programs: state.programs.map((program) =>
+        program.id === programId
+          ? {
+              ...program,
+              modules: program.modules.map((m) =>
+                m.id === updatedModule.id ? updatedModule : m
+              ),
+            }
+          : program
       ),
     })),
 }));

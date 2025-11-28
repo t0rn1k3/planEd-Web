@@ -9,20 +9,36 @@ import styles from "./AddModuleModal.module.css";
 export default function AddModuleModal({
   programId,
   onClose,
+  existingModule,
 }: {
   programId: string;
   onClose: () => void;
+  existingModule?: Module;
 }) {
-  const { addModule } = useProgramStore();
+  const { addModule, updateModule } = useProgramStore();
 
-  const [code, setCode] = useState("");
-  const [name, setName] = useState("");
-  const [type, setType] = useState<ModuleType>("professional");
-  const [contactHours, setContact] = useState("");
-  const [independentHours, setIndependent] = useState("");
-  const [assessmentHours, setAssessment] = useState("");
-  const [durationWeeks, setWeeks] = useState("");
-  const [credits, setCredits] = useState("");
+  const isEdit = !!existingModule;
+
+  const [code, setCode] = useState(existingModule?.code || "");
+  const [name, setName] = useState(existingModule?.name || "");
+  const [type, setType] = useState<ModuleType>(
+    existingModule?.type || "professional"
+  );
+  const [contactHours, setContact] = useState(
+    existingModule?.contactHours.toString() || ""
+  );
+  const [independentHours, setIndependent] = useState(
+    existingModule?.independentHours.toString() || ""
+  );
+  const [assessmentHours, setAssessment] = useState(
+    existingModule?.assessmentHours.toString() || ""
+  );
+  const [durationWeeks, setWeeks] = useState(
+    existingModule?.durationWeeks.toString() || ""
+  );
+  const [credits, setCredits] = useState(
+    existingModule?.credits.toString() || ""
+  );
 
   const distributeWeeklyHours = (total: number, weeks: number) => {
     const base = Math.floor(total / weeks);
@@ -62,7 +78,12 @@ export default function AddModuleModal({
       weeklyOverrides,
     };
 
-    addModule(programId, modules);
+    if (isEdit) {
+      updateModule(programId, modules);
+    } else {
+      addModule(programId, modules);
+    }
+
     onClose();
   };
 

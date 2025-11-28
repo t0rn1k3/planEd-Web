@@ -40,3 +40,34 @@
   padding: 1rem;
   border-radius: 6px;
 }
+.addModuleButton {
+  padding: 10px;
+  cursor: pointer;
+  background-color: transparent;
+  border: 0;
+  background: var(--color-primary);
+  color: white;
+  transition: 0.3s;
+}
+.addModuleButton:hover {
+  background-color: var(--color-hover);
+}
+.deleteProgram {
+  padding: 7px;
+  cursor: pointer;
+  background-color: var(--color-error);
+  color: white;
+  margin-bottom: 10px;
+  border: 0;
+  transition: 0.3s;
+}
+.deleteProgram:hover {
+  background-color: var(--color-error-hover);
+}
+.programName {
+  font-size: 22px;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--color-primary);
+}
