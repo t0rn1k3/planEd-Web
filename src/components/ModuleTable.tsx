@@ -1,6 +1,7 @@
 import { CurriculumProgram, Module } from "@/types/program";
 import { getWeekLabels } from "@/lib/dateUtils";
 import styles from "./ModuleTable.module.css";
+import ModuleRow from "./ModuleRow";
 
 export default function ModuleTable({
   program,
@@ -12,6 +13,13 @@ export default function ModuleTable({
     program.startDate,
     Array.from({ length: weeks }, (_, i) => i)
   );
+
+  const typeLabels: Record<Module["type"], string> = {
+    professional: "დარგობრივი",
+    general: "ზოგადი",
+    commonProfessional: "საერთო დარგობრივი",
+    integratedGeneral: "ინტეგრირებული ზოგადი",
+  };
 
   return (
     <div className={styles.tableWrapper}>
@@ -43,24 +51,8 @@ export default function ModuleTable({
         </thead>
 
         <tbody>
-          {program.modules.map((m: Module) => (
-            <tr key={m.id}>
-              <td>{m.code}</td>
-              <td>{m.name}</td>
-              <td>{m.type}</td>
-              <td>{m.contactHours + m.independentHours + m.assessmentHours}</td>
-              <td>{m.contactHours}</td>
-              <td>{m.independentHours}</td>
-              <td>{m.assessmentHours}</td>
-              <td>{m.durationWeeks}</td>
-              <td>{m.credits}</td>
-
-              {Array.from({ length: weeks }).map((_, weekIndex) => (
-                <td key={weekIndex}>
-                  {m.weeklyOverrides[weekIndex + 1] ?? ""}
-                </td>
-              ))}
-            </tr>
+          {program.modules.map((m) => (
+            <ModuleRow key={m.id} module={m} totalWeeks={weeks} />
           ))}
         </tbody>
       </table>

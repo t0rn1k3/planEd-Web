@@ -7,6 +7,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  margin: 20px 0;
 }
 
 .table th,
@@ -25,7 +26,11 @@
 .weekdays {
   writing-mode: vertical-lr;
   text-orientation: mixed;
+  background-color: var(--color-secondary);
 }
 .weeknumbers {
   font-style: italic;
+}
+.input {
+  border: 0;
 }
