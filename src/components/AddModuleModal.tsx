@@ -16,7 +16,6 @@ export default function AddModuleModal({
   existingModule?: Module;
 }) {
   const { addModule, updateModule } = useProgramStore();
-
   const isEdit = !!existingModule;
 
   const [code, setCode] = useState(existingModule?.code || "");
@@ -39,33 +38,48 @@ export default function AddModuleModal({
   const [credits, setCredits] = useState(
     existingModule?.credits.toString() || ""
   );
+  const [startWeek, setStartWeek] = useState(
+    existingModule?.startWeek.toString() || "1"
+  );
 
-  const distributeWeeklyHours = (total: number, weeks: number) => {
-    const base = Math.floor(total / weeks);
-    const remainder = total % weeks;
-
+  const distributeWeeklyHours = (
+    total: number,
+    duration: number,
+    start: number
+  ) => {
+    const base = Math.floor(total / duration);
+    const remainder = total % duration;
     const result: Record<number, number> = {};
 
-    for (let i = 1; i <= weeks; i++) {
-      result[i] = base + (i <= remainder ? 1 : 0);
+    for (let i = 0; i < duration; i++) {
+      result[start + i] = base + (i < remainder ? 1 : 0);
     }
 
     return result;
   };
 
   const onSubmit = () => {
-    if (!code || !name || !contactHours || !assessmentHours || !durationWeeks)
+    if (
+      !code ||
+      !name ||
+      !contactHours ||
+      !assessmentHours ||
+      !durationWeeks ||
+      !startWeek
+    )
       return;
 
     const contact = parseInt(contactHours);
     const independent = parseInt(independentHours || "0");
     const assessment = parseInt(assessmentHours);
     const weeks = parseInt(durationWeeks);
+    const start = parseInt(startWeek);
+    const total = contact + assessment;
 
-    const weeklyOverrides = distributeWeeklyHours(contact + assessment, weeks);
+    const weeklyOverrides = distributeWeeklyHours(total, weeks, start);
 
-    const modules: Module = {
-      id: uuid(),
+    const moduleData: Module = {
+      id: isEdit ? existingModule!.id : uuid(),
       code,
       name,
       type,
@@ -74,14 +88,14 @@ export default function AddModuleModal({
       assessmentHours: assessment,
       durationWeeks: weeks,
       credits: parseInt(credits || "0"),
-      startWeek: 1,
+      startWeek: start,
       weeklyOverrides,
     };
 
     if (isEdit) {
-      updateModule(programId, modules);
+      updateModule(programId, moduleData);
     } else {
-      addModule(programId, modules);
+      addModule(programId, moduleData);
     }
 
     onClose();
@@ -90,7 +104,7 @@ export default function AddModuleModal({
   return (
     <div className={styles.modal}>
       <div className={styles.modalBody}>
-        <h2>მოდულის დამატება</h2>
+        <h2>{isEdit ? "მოდულის რედაქტირება" : "მოდულის დამატება"}</h2>
 
         <input
           placeholder="კოდი"
@@ -102,7 +116,6 @@ export default function AddModuleModal({
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-
         <select
           value={type}
           onChange={(e) => setType(e.target.value as ModuleType)}
@@ -112,7 +125,6 @@ export default function AddModuleModal({
           <option value="general">ზოგადი</option>
           <option value="integratedGeneral">ინტეგრირებული ზოგადი</option>
         </select>
-
         <input
           placeholder="საკონტაქტო საათები"
           type="number"
@@ -143,8 +155,14 @@ export default function AddModuleModal({
           value={credits}
           onChange={(e) => setCredits(e.target.value)}
         />
+        <input
+          placeholder="დასაწყისი კვირა"
+          type="number"
+          value={startWeek}
+          onChange={(e) => setStartWeek(e.target.value)}
+        />
 
-        <button onClick={onSubmit}>დამატება</button>
+        <button onClick={onSubmit}>{isEdit ? "შენახვა" : "დამატება"}</button>
         <button onClick={onClose}>გაუქმება</button>
       </div>
     </div>

@@ -26,3 +26,6 @@
   writing-mode: vertical-lr;
   text-orientation: mixed;
 }
+.weeknumbers {
+  font-style: italic;
+}

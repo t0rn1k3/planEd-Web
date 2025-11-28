@@ -28,7 +28,9 @@ export default function ModuleTable({
             <th rowSpan={2}>კვირები</th>
             <th rowSpan={2}>კრედიტი</th>
             {Array.from({ length: weeks }).map((_, i) => (
-              <th key={i}>კვ.{i + 1}</th>
+              <th key={i} className="weeknumbers">
+                კვ.{i + 1}
+              </th>
             ))}
           </tr>
           <tr>

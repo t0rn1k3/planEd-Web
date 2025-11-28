@@ -45,8 +45,12 @@
 }
 
 .modalBody button:first-of-type {
-  background: #0077ff;
+  background: var(--color-primary);
   color: #fff;
+  transition: 0.3s;
+}
+.modalBody button:first-of-type:hover {
+  background: var(--color-hover);
 }
 
 .modalBody button:last-of-type {
