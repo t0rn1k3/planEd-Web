@@ -2,25 +2,82 @@ import { CurriculumProgram, Module } from "@/types/program";
 import { getWeekLabels } from "@/lib/dateUtils";
 import styles from "./ModuleTable.module.css";
 import ModuleRow from "./ModuleRow";
+import * as XLSX from "xlsx";
+import { useState } from "react";
+import { useProgramStore } from "@/store/programSore";
 
 export default function ModuleTable({
   program,
 }: {
   program: CurriculumProgram;
 }) {
+  const { updateModule } = useProgramStore();
   const weeks = program.totalWeeks;
   const weekLabels = getWeekLabels(
     program.startDate,
     Array.from({ length: weeks }, (_, i) => i)
   );
 
-  const typeLabels: Record<Module["type"], string> = {
-    professional: "დარგობრივი",
-    general: "ზოგადი",
-    commonProfessional: "საერთო დარგობრივი",
-    integratedGeneral: "ინტეგრირებული ზოგადი",
+  type ModuleOverrides = Record<string, Record<number, number>>;
+
+  function distributeEvenly(
+    total: number,
+    weeks: number
+  ): Record<number, number> {
+    const base = Math.floor(total / weeks);
+    const remainder = total % weeks;
+    const result: Record<number, number> = {};
+
+    for (let i = 1; i <= weeks; i++) {
+      result[i] = base + (i <= remainder ? 1 : 0);
+    }
+
+    return result;
+  }
+
+  const [overrides, setOverrides] = useState<ModuleOverrides>(() =>
+    Object.fromEntries(
+      program.modules.map((m) => {
+        const baseDistribution = distributeEvenly(
+          m.contactHours + m.assessmentHours,
+          m.durationWeeks
+        );
+        return [m.id, { ...baseDistribution, ...m.weeklyOverrides }];
+      })
+    )
+  );
+
+  const updateWeek = (moduleId: string, week: number, value: string) => {
+    const num = parseInt(value, 10) || 0;
+    setOverrides((prev) => ({
+      ...prev,
+      [moduleId]: {
+        ...prev[moduleId],
+        [week]: num,
+      },
+    }));
   };
 
+  const saveOverrides = (moduleId: string) => {
+    const modulE = program.modules.find((m) => m.id === moduleId);
+    if (!modulE) return;
+
+    const updatedModule: Module = {
+      id: modulE.id,
+      code: modulE.code,
+      name: modulE.name,
+      type: modulE.type,
+      contactHours: modulE.contactHours,
+      independentHours: modulE.independentHours,
+      assessmentHours: modulE.assessmentHours,
+      durationWeeks: modulE.durationWeeks,
+      credits: modulE.credits,
+      startWeek: modulE.startWeek,
+      weeklyOverrides: { ...overrides[moduleId] },
+    };
+
+    updateModule(program.id, updatedModule);
+  };
   return (
     <div className={styles.tableWrapper}>
       <table className={styles.table}>
@@ -52,7 +109,14 @@ export default function ModuleTable({
 
         <tbody>
           {program.modules.map((m) => (
-            <ModuleRow key={m.id} module={m} totalWeeks={weeks} />
+            <ModuleRow
+              key={m.id}
+              module={m}
+              totalWeeks={weeks}
+              weekly={overrides[m.id]}
+              onWeekChange={updateWeek}
+              onSave={saveOverrides}
+            />
           ))}
         </tbody>
       </table>

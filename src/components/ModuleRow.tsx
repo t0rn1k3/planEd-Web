@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { Module } from "@/types/program";
 import styles from "./ModuleRow.module.css";
 
 type Props = {
   module: Module;
   totalWeeks: number;
+  weekly?: Record<number, number>;
+  onWeekChange: (moduleId: string, week: number, value: string) => void;
+  onSave: (moduleId: string) => void;
 };
 
 const typeLabels: Record<Module["type"], string> = {
@@ -16,20 +18,16 @@ const typeLabels: Record<Module["type"], string> = {
   integratedGeneral: "ინტეგრირებული ზოგადი",
 };
 
-export default function ModuleRow({ module, totalWeeks }: Props) {
+export default function ModuleRow({
+  module,
+  totalWeeks,
+  weekly = {},
+  onWeekChange,
+  onSave,
+}: Props) {
   const totalRequired = module.contactHours + module.assessmentHours;
-
-  const [weekly, setWeekly] = useState<Record<number, number>>({
-    ...module.weeklyOverrides,
-  });
-
-  const sum = Object.values(weekly).reduce((acc, v) => acc + v, 0);
+  const sum = Object.values(weekly || {}).reduce((acc, v) => acc + v, 0);
   const isInvalid = sum !== totalRequired;
-
-  const updateWeek = (week: number, value: string) => {
-    const num = parseInt(value, 10) || 0;
-    setWeekly((prev) => ({ ...prev, [week]: num }));
-  };
 
   return (
     <tr>
@@ -57,7 +55,7 @@ export default function ModuleRow({ module, totalWeeks }: Props) {
             <input
               type="number"
               value={weekly[week] ?? ""}
-              onChange={(e) => updateWeek(week, e.target.value)}
+              onChange={(e) => onWeekChange(module.id, week, e.target.value)}
               className={styles.input}
               style={{
                 borderColor: isInvalid ? "red" : "#ccc",
@@ -66,6 +64,16 @@ export default function ModuleRow({ module, totalWeeks }: Props) {
           </td>
         );
       })}
+
+      <td>
+        <button
+          onClick={() => onSave(module.id)}
+          disabled={isInvalid}
+          className={styles.saveButton}
+        >
+          Save
+        </button>
+      </td>
     </tr>
   );
 }
