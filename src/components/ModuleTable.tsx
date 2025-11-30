@@ -1,3 +1,5 @@
+"use client";
+
 import { CurriculumProgram, Module } from "@/types/program";
 import { getWeekLabels } from "@/lib/dateUtils";
 import styles from "./ModuleTable.module.css";
@@ -22,13 +24,13 @@ export default function ModuleTable({
 
   function distributeEvenly(
     total: number,
-    weeks: number
+    duration: number
   ): Record<number, number> {
-    const base = Math.floor(total / weeks);
-    const remainder = total % weeks;
+    const base = Math.floor(total / duration);
+    const remainder = total % duration;
     const result: Record<number, number> = {};
 
-    for (let i = 1; i <= weeks; i++) {
+    for (let i = 1; i <= duration; i++) {
       result[i] = base + (i <= remainder ? 1 : 0);
     }
 
@@ -38,11 +40,11 @@ export default function ModuleTable({
   const [overrides, setOverrides] = useState<ModuleOverrides>(() =>
     Object.fromEntries(
       program.modules.map((m) => {
-        const baseDistribution = distributeEvenly(
+        const dist = distributeEvenly(
           m.contactHours + m.assessmentHours,
           m.durationWeeks
         );
-        return [m.id, { ...baseDistribution, ...m.weeklyOverrides }];
+        return [m.id, { ...dist, ...m.weeklyOverrides }];
       })
     )
   );
@@ -62,22 +64,21 @@ export default function ModuleTable({
     const modulE = program.modules.find((m) => m.id === moduleId);
     if (!modulE) return;
 
+    const updatedWeekly = overrides[moduleId];
+
     const updatedModule: Module = {
-      id: modulE.id,
-      code: modulE.code,
-      name: modulE.name,
-      type: modulE.type,
-      contactHours: modulE.contactHours,
-      independentHours: modulE.independentHours,
-      assessmentHours: modulE.assessmentHours,
-      durationWeeks: modulE.durationWeeks,
-      credits: modulE.credits,
-      startWeek: modulE.startWeek,
-      weeklyOverrides: { ...overrides[moduleId] },
+      ...modulE,
+      weeklyOverrides: { ...updatedWeekly },
     };
 
     updateModule(program.id, updatedModule);
+
+    setOverrides((prev) => ({
+      ...prev,
+      [moduleId]: updatedWeekly,
+    }));
   };
+
   return (
     <div className={styles.tableWrapper}>
       <table className={styles.table}>

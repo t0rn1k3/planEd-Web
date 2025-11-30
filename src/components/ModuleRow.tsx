@@ -6,7 +6,7 @@ import styles from "./ModuleRow.module.css";
 type Props = {
   module: Module;
   totalWeeks: number;
-  weekly?: Record<number, number>;
+  weekly: Record<number, number>;
   onWeekChange: (moduleId: string, week: number, value: string) => void;
   onSave: (moduleId: string) => void;
 };
@@ -18,15 +18,41 @@ const typeLabels: Record<Module["type"], string> = {
   integratedGeneral: "ინტეგრირებული ზოგადი",
 };
 
+function getDistributedFallback(module: Module): Record<number, number> {
+  const total = module.contactHours + module.assessmentHours;
+  const duration = module.durationWeeks;
+  const start = module.startWeek ?? 1;
+
+  const base = Math.floor(total / duration);
+  const remainder = total % duration;
+  const result: Record<number, number> = {};
+
+  for (let i = 1; i < start; i++) {
+    result[i] = 0;
+  }
+
+  for (let i = 0; i < duration; i++) {
+    const week = start + i;
+    result[week] = base + (i < remainder ? 1 : 0);
+  }
+
+  return result;
+}
+
 export default function ModuleRow({
   module,
   totalWeeks,
-  weekly = {},
+  weekly,
   onWeekChange,
   onSave,
 }: Props) {
+  const weeklyWithFallback =
+    Object.keys(weekly ?? {}).length === 0
+      ? getDistributedFallback(module)
+      : weekly;
+
   const totalRequired = module.contactHours + module.assessmentHours;
-  const sum = Object.values(weekly || {}).reduce((acc, v) => acc + v, 0);
+  const sum = Object.values(weeklyWithFallback).reduce((acc, v) => acc + v, 0);
   const isInvalid = sum !== totalRequired;
 
   return (
@@ -54,7 +80,9 @@ export default function ModuleRow({
           <td key={week}>
             <input
               type="number"
-              value={weekly[week] ?? ""}
+              value={
+                weeklyWithFallback[week] === 0 ? "" : weeklyWithFallback[week]
+              }
               onChange={(e) => onWeekChange(module.id, week, e.target.value)}
               className={styles.input}
               style={{
