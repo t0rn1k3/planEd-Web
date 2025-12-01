@@ -107,12 +107,12 @@ export default function AddModuleModal({
         <h2>{isEdit ? "მოდულის რედაქტირება" : "მოდულის დამატება"}</h2>
 
         <input
-          placeholder="კოდი"
+          placeholder="პროგრამის კოდი"
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
         <input
-          placeholder="სახელი"
+          placeholder="პროგრამის სახელი"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -132,19 +132,19 @@ export default function AddModuleModal({
           onChange={(e) => setContact(e.target.value)}
         />
         <input
-          placeholder="დამოუკიდებელი"
+          placeholder="დამოუკიდებელი საათები"
           type="number"
           value={independentHours}
           onChange={(e) => setIndependent(e.target.value)}
         />
         <input
-          placeholder="შეფასება"
+          placeholder="შეფასების საათები"
           type="number"
           value={assessmentHours}
           onChange={(e) => setAssessment(e.target.value)}
         />
         <input
-          placeholder="კვირები"
+          placeholder="პროგრამის ხანგრძ. კვირებში"
           type="number"
           value={durationWeeks}
           onChange={(e) => setWeeks(e.target.value)}

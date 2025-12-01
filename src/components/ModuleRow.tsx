@@ -9,6 +9,7 @@ type Props = {
   weekly: Record<number, number>;
   onWeekChange: (moduleId: string, week: number, value: string) => void;
   onSave: (moduleId: string) => void;
+  colorIndex: number;
 };
 
 const typeLabels: Record<Module["type"], string> = {
@@ -45,7 +46,11 @@ export default function ModuleRow({
   weekly,
   onWeekChange,
   onSave,
+  colorIndex,
 }: Props) {
+  const colorClasses = [styles.rowColor1, styles.rowColor2, styles.rowColor3];
+  const colorClass = colorClasses[colorIndex];
+
   const weeklyWithFallback =
     Object.keys(weekly ?? {}).length === 0
       ? getDistributedFallback(module)
@@ -76,8 +81,9 @@ export default function ModuleRow({
 
       {Array.from({ length: totalWeeks }).map((_, index) => {
         const week = index + 1;
+        const value = weeklyWithFallback[week];
         return (
-          <td key={week}>
+          <td key={week} className={value > 0 ? colorClass : undefined}>
             <input
               type="number"
               value={

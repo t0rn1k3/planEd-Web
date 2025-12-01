@@ -4,7 +4,6 @@ import { CurriculumProgram, Module } from "@/types/program";
 import { getWeekLabels } from "@/lib/dateUtils";
 import styles from "./ModuleTable.module.css";
 import ModuleRow from "./ModuleRow";
-import * as XLSX from "xlsx";
 import { useState } from "react";
 import { useProgramStore } from "@/store/programSore";
 
@@ -109,7 +108,7 @@ export default function ModuleTable({
         </thead>
 
         <tbody>
-          {program.modules.map((m) => (
+          {program.modules.map((m, index) => (
             <ModuleRow
               key={m.id}
               module={m}
@@ -117,6 +116,7 @@ export default function ModuleTable({
               weekly={overrides[m.id]}
               onWeekChange={updateWeek}
               onSave={saveOverrides}
+              colorIndex={index % 3}
             />
           ))}
         </tbody>
