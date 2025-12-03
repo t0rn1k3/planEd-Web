@@ -1,0 +1,4 @@
+*{box-sizing:border-box;margin:0;padding:0;font-family:BPG Algeti Compact}
+@font-face{font-family:BPG Algeti Compact;src:url(../media/bpg-algeti-compact-webfont.7ffa8a61.woff2)format("woff2"),url(../media/bpg-algeti-compact-webfont.818db2e5.woff)format("woff")}
+:root{--color-primary:#174143;--color-secondary:#f9b487;--color-hover:#427a76;--color-error:#f33;--color-error-hover:#f96c6c}
+.Header-module__hBw1pG__header{background-color:var(--color-primary)}.Header-module__hBw1pG__logo{cursor:pointer}
