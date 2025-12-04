@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProgramStore } from "@/store/programSore";
 
 import AddProgramModal from "@/components/AddProgramModal";
@@ -10,7 +10,7 @@ import ModuleTable from "@/components/ModuleTable";
 import styles from "./CurriculumPage.module.css";
 
 export default function CurriculumPage() {
-  const { programs, removeProgram } = useProgramStore();
+  const { programs, removeProgram, fetchPrograms } = useProgramStore();
 
   const [openPrograms, setOpenPrograms] = useState<Set<string>>(new Set());
 
@@ -21,6 +21,10 @@ export default function CurriculumPage() {
       return newSet;
     });
   };
+
+  useEffect(() => {
+    fetchPrograms();
+  }, []);
 
   const [showAddProgram, setShowAddProgram] = useState(false);
   const [showAddModule, setShowAddModule] = useState<null | string>(null);

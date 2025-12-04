@@ -35,8 +35,7 @@
 }
 
 .programList {
-  color: black;
-  padding: 1rem;
+  color: var(--color-error-hover);
   border-radius: 6px;
 }
 .addModuleButton {
