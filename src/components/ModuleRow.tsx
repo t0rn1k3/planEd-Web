@@ -63,7 +63,7 @@ export default function ModuleRow({
   return (
     <tr>
       <td>{module.code}</td>
-      <td>{module.name}</td>
+      <td className={styles.moduleNameCell}>{module.name}</td>
       <td>{typeLabels[module.type]}</td>
 
       <td style={{ color: isInvalid ? "red" : undefined }}>

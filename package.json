@@ -6,7 +6,7 @@
     "build": "next build",
     "serve": "next start",
     "deploy": "firebase deploy",
-    "dev": "firebase emulators:start"
+    "dev": "next dev"
   },
   "dependencies": {
     "firebase-admin": "^13.6.0",
@@ -24,6 +24,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
+    "baseline-browser-mapping": "^2.9.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "firebase-tools": "^14.26.0",

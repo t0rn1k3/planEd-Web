@@ -12,6 +12,16 @@ import styles from "./CurriculumPage.module.css";
 export default function CurriculumPage() {
   const { programs, removeProgram } = useProgramStore();
 
+  const [openPrograms, setOpenPrograms] = useState<Set<string>>(new Set());
+
+  const toggleOpen = (id: string) => {
+    setOpenPrograms((prev) => {
+      const newSet = new Set(prev);
+      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+      return newSet;
+    });
+  };
+
   const [showAddProgram, setShowAddProgram] = useState(false);
   const [showAddModule, setShowAddModule] = useState<null | string>(null);
 
@@ -38,32 +48,48 @@ export default function CurriculumPage() {
           <p>სასწავლო პროგრამები ჯერ არ არის დამატებული.</p>
         ) : (
           programs.map((program) => (
-            <div key={program.id} className={styles.programCard}>
-              <div className={styles.programHeader}>
-                <h2 className={styles.programName}>{program.name}</h2>
+            <div key={program.id} className={styles.programContainer}>
+              <div className={styles.programCard}>
+                <div className={styles.programHeader}>
+                  <div className={styles.heading}>
+                    <h2 className={styles.programName}>{program.name}</h2>
+                    <button
+                      onClick={() => toggleOpen(program.id)}
+                      className={styles.toggleArrow}
+                    >
+                      {openPrograms.has(program.id) ? "⬆️" : "⬇️"}
+                    </button>
+                  </div>
+                  <button
+                    className={styles.deleteProgram}
+                    onClick={() => removeProgram(program.id)}
+                  >
+                    პროგრამის წაშლა
+                  </button>
+                </div>
+
                 <button
-                  className={styles.deleteProgram}
-                  onClick={() => removeProgram(program.id)}
+                  className={styles.addModuleButton}
+                  onClick={() => setShowAddModule(program.id)}
                 >
-                  პროგრამის წაშლა
+                  + მოდულის დამატება
                 </button>
+
+                {showAddModule === program.id && (
+                  <AddModuleModal
+                    programId={program.id}
+                    onClose={() => setShowAddModule(null)}
+                  />
+                )}
+
+                <div
+                  className={`${styles.programContent} ${
+                    openPrograms.has(program.id) ? styles.open : styles.close
+                  }`}
+                >
+                  <ModuleTable program={program} />
+                </div>
               </div>
-
-              <button
-                className={styles.addModuleButton}
-                onClick={() => setShowAddModule(program.id)}
-              >
-                + მოდულის დამატება
-              </button>
-
-              {showAddModule === program.id && (
-                <AddModuleModal
-                  programId={program.id}
-                  onClose={() => setShowAddModule(null)}
-                />
-              )}
-
-              <ModuleTable program={program} />
             </div>
           ))
         )}

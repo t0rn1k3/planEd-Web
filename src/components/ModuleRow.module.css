@@ -12,6 +12,13 @@
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
+.moduleNameCell {
+  max-width: 300px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal !important;
+}
+
 .rowColor1 {
   background-color: rgba(182, 250, 254, 0.5);
 }
