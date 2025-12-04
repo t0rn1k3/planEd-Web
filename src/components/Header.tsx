@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import logo from "@/assets/logo.png";
+import logo from "../../public/logo.png";
 import "@/styles/colors.css";
 import "@/styles/globals.css";
 import styles from "./Header.module.css";
