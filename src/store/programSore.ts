@@ -52,34 +52,36 @@ export const useProgramStore = create<ProgramState>((set, get) => ({
   },
 
   addModule: async (programId, module) => {
-    const currentPrograms = get().programs;
-    const target = currentPrograms.find((p) => p.id === programId);
-    if (!target) return;
+    const programRef = doc(db, "programs", programId);
+    const snapshot = await getDocs(collection(db, "programs"));
+    const currentProgram = snapshot.docs.find((d) => d.id === programId);
+    const existingModules = currentProgram?.data()?.modules || [];
 
-    const updated = {
-      ...target,
-      modules: [...target.modules, module],
-    };
+    const updatedModules = [...existingModules, module];
+    await updateDoc(programRef, { modules: updatedModules });
 
-    await updateDoc(doc(db, "programs", programId), updated);
     set((state) => ({
-      programs: state.programs.map((p) => (p.id === programId ? updated : p)),
+      programs: state.programs.map((p) =>
+        p.id === programId ? { ...p, modules: updatedModules } : p
+      ),
     }));
   },
 
   removeModule: async (programId, moduleId) => {
-    const currentPrograms = get().programs;
-    const target = currentPrograms.find((p) => p.id === programId);
-    if (!target) return;
+    const programRef = doc(db, "programs", programId);
+    const snapshot = await getDocs(collection(db, "programs"));
+    const currentProgram = snapshot.docs.find((d) => d.id === programId);
+    const existingModules = currentProgram?.data()?.modules || [];
 
-    const updated = {
-      ...target,
-      modules: target.modules.filter((m) => m.id !== moduleId),
-    };
+    const updatedModules = existingModules.filter(
+      (m: Module) => m.id !== moduleId
+    );
+    await updateDoc(programRef, { modules: updatedModules });
 
-    await updateDoc(doc(db, "programs", programId), updated);
     set((state) => ({
-      programs: state.programs.map((p) => (p.id === programId ? updated : p)),
+      programs: state.programs.map((p) =>
+        p.id === programId ? { ...p, modules: updatedModules } : p
+      ),
     }));
   },
 

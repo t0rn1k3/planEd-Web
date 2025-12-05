@@ -17,14 +17,17 @@ export default function CurriculumPage() {
   const toggleOpen = (id: string) => {
     setOpenPrograms((prev) => {
       const newSet = new Set(prev);
-      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
       return newSet;
     });
   };
-
   useEffect(() => {
     fetchPrograms();
-  }, []);
+  }, [fetchPrograms]);
 
   const [showAddProgram, setShowAddProgram] = useState(false);
   const [showAddModule, setShowAddModule] = useState<null | string>(null);
