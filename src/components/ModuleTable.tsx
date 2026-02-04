@@ -4,7 +4,7 @@ import { CurriculumProgram, Module } from "@/types/program";
 import { getWeekLabels } from "@/lib/dateUtils";
 import styles from "./ModuleTable.module.css";
 import ModuleRow from "./ModuleRow";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProgramStore } from "@/store/programSore";
 
 export default function ModuleTable({
@@ -23,14 +23,22 @@ export default function ModuleTable({
 
   function distributeEvenly(
     total: number,
-    duration: number
+    duration: number,
+    startWeek: number
   ): Record<number, number> {
     const base = Math.floor(total / duration);
     const remainder = total % duration;
     const result: Record<number, number> = {};
 
-    for (let i = 1; i <= duration; i++) {
-      result[i] = base + (i <= remainder ? 1 : 0);
+    // Set weeks before startWeek to 0
+    for (let i = 1; i < startWeek; i++) {
+      result[i] = 0;
+    }
+
+    // Distribute hours starting from startWeek
+    for (let i = 0; i < duration; i++) {
+      const week = startWeek + i;
+      result[week] = base + (i < remainder ? 1 : 0);
     }
 
     return result;
@@ -40,13 +48,43 @@ export default function ModuleTable({
     Object.fromEntries(
       program.modules.map((m) => {
         const dist = distributeEvenly(
-          m.contactHours + m.assessmentHours,
-          m.durationWeeks
+          Number(m.contactHours) + Number(m.assessmentHours),
+          m.durationWeeks,
+          m.startWeek ?? 1
         );
         return [m.id, { ...dist, ...m.weeklyOverrides }];
       })
     )
   );
+
+  // Update overrides when modules are added or removed
+  useEffect(() => {
+    setOverrides((prev) => {
+      const newOverrides: ModuleOverrides = { ...prev };
+      const moduleIds = new Set(program.modules.map((m) => m.id));
+
+      // Remove overrides for deleted modules
+      Object.keys(newOverrides).forEach((id) => {
+        if (!moduleIds.has(id)) {
+          delete newOverrides[id];
+        }
+      });
+
+      // Add overrides for new modules
+      program.modules.forEach((m) => {
+        if (!newOverrides[m.id]) {
+          const dist = distributeEvenly(
+            Number(m.contactHours) + Number(m.assessmentHours),
+            m.durationWeeks,
+            m.startWeek ?? 1
+          );
+          newOverrides[m.id] = { ...dist, ...m.weeklyOverrides };
+        }
+      });
+
+      return newOverrides;
+    });
+  }, [program.modules]);
 
   const updateWeek = (moduleId: string, week: number, value: string) => {
     const num = parseInt(value, 10) || 0;
@@ -83,24 +121,24 @@ export default function ModuleTable({
       <table className={styles.table}>
         <thead>
           <tr>
-            <th rowSpan={2}>კოდი</th>
-            <th rowSpan={2}>სახელი</th>
-            <th rowSpan={2}>ტიპი</th>
-            <th rowSpan={2}>სულ</th>
-            <th rowSpan={2}>კონტ.</th>
-            <th rowSpan={2}>დამოუკიდ.</th>
-            <th rowSpan={2}>შეფას.</th>
-            <th rowSpan={2}>კვირები</th>
-            <th rowSpan={2}>კრედიტი</th>
+            <th rowSpan={2} style={{ color: "initial" }}>კოდი</th>
+            <th rowSpan={2} style={{ color: "initial" }}>სახელი</th>
+            <th rowSpan={2} style={{ color: "initial" }}>ტიპი</th>
+            <th rowSpan={2} style={{ color: "initial" }}>სულ</th>
+            <th rowSpan={2} style={{ color: "initial" }}>კონტ.</th>
+            <th rowSpan={2} style={{ color: "initial" }}>დამოუკიდ.</th>
+            <th rowSpan={2} style={{ color: "initial" }}>შეფას.</th>
+            <th rowSpan={2} style={{ color: "initial" }}>კვირები</th>
+            <th rowSpan={2} style={{ color: "initial" }}>კრედიტი</th>
             {Array.from({ length: weeks }).map((_, i) => (
-              <th key={i} className="weeknumbers">
+              <th key={i} className="weeknumbers" style={{ color: "initial" }}>
                 კვ.{i + 1}
               </th>
             ))}
           </tr>
           <tr>
             {weekLabels.map((label, i) => (
-              <th key={i} className={styles.weekdays}>
+              <th key={i} className={styles.weekdays} style={{ color: "initial" }}>
                 {label}
               </th>
             ))}

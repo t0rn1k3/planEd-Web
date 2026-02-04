@@ -10,7 +10,7 @@ import ModuleTable from "@/components/ModuleTable";
 import styles from "./CurriculumPage.module.css";
 
 export default function CurriculumPage() {
-  const { programs, removeProgram, fetchPrograms } = useProgramStore();
+  const { programs, removeProgram } = useProgramStore();
 
   const [openPrograms, setOpenPrograms] = useState<Set<string>>(new Set());
 
@@ -25,9 +25,6 @@ export default function CurriculumPage() {
       return newSet;
     });
   };
-  useEffect(() => {
-    fetchPrograms();
-  }, [fetchPrograms]);
 
   const [showAddProgram, setShowAddProgram] = useState(false);
   const [showAddModule, setShowAddModule] = useState<null | string>(null);

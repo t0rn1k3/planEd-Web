@@ -24,6 +24,7 @@ function getDistributedFallback(module: Module): Record<number, number> {
   const duration = module.durationWeeks;
   const start = module.startWeek ?? 1;
 
+
   const base = Math.floor(total / duration);
   const remainder = total % duration;
   const result: Record<number, number> = {};
@@ -51,48 +52,53 @@ export default function ModuleRow({
   const colorClasses = [styles.rowColor1, styles.rowColor2, styles.rowColor3];
   const colorClass = colorClasses[colorIndex];
 
+
+    const endWeek = module.startWeek + module.durationWeeks - 1;
+
   const weeklyWithFallback =
     Object.keys(weekly ?? {}).length === 0
       ? getDistributedFallback(module)
       : weekly;
 
   const totalRequired = module.contactHours + module.assessmentHours;
-  const sum = Object.values(weeklyWithFallback).reduce((acc, v) => acc + v, 0);
+  const sum = Object.entries(weeklyWithFallback).filter(([week])=>{
+    const w = Number(week)
+    return w>= module.startWeek && w<= endWeek
+  }).reduce((acc, [ , v]) => acc + Number(v || 0), 0)
   const isInvalid = sum !== totalRequired;
 
   return (
     <tr>
-      <td>{module.code}</td>
-      <td className={styles.moduleNameCell}>{module.name}</td>
-      <td>{typeLabels[module.type]}</td>
+      <td style={{ color: "initial" }}>{module.code}</td>
+      <td className={styles.moduleNameCell} style={{ color: "initial" }}>{module.name}</td>
+      <td style={{ color: "initial" }}>{typeLabels[module.type]}</td>
 
-      <td style={{ color: isInvalid ? "red" : undefined }}>
+      <td style={{ color: isInvalid ? "red" : "initial" }}>
         {module.contactHours + module.independentHours + module.assessmentHours}
       </td>
-      <td style={{ color: isInvalid ? "red" : undefined }}>
+      <td style={{ color: isInvalid ? "red" : "initial" }}>
         {module.contactHours}
       </td>
-      <td>{module.independentHours}</td>
-      <td style={{ color: isInvalid ? "red" : undefined }}>
+      <td style={{ color: "initial" }}>{module.independentHours}</td>
+      <td style={{ color: isInvalid ? "red" : "initial" }}>
         {module.assessmentHours}
       </td>
-      <td>{module.durationWeeks}</td>
-      <td>{module.credits}</td>
+      <td style={{ color: "initial" }}>{module.durationWeeks}</td>
+      <td style={{ color: "initial" }}>{module.credits}</td>
 
       {Array.from({ length: totalWeeks }).map((_, index) => {
         const week = index + 1;
-        const value = weeklyWithFallback[week];
+        const value = weeklyWithFallback[week] || 0;
         return (
-          <td key={week} className={value > 0 ? colorClass : undefined}>
+          <td key={week} className={value > 0 ? colorClass : undefined} style={{ color: "initial" }}>
             <input
               type="number"
-              value={
-                weeklyWithFallback[week] === 0 ? "" : weeklyWithFallback[week]
-              }
+              value={value === 0 ? "" : value}
               onChange={(e) => onWeekChange(module.id, week, e.target.value)}
               className={styles.input}
               style={{
                 borderColor: isInvalid ? "red" : "#ccc",
+                color: "initial",
               }}
             />
           </td>
