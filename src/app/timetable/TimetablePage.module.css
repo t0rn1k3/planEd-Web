@@ -31,6 +31,32 @@
   margin-bottom: 1rem;
 }
 
+.pageHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.listActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.listMeta {
+  color: #6a6a6a;
+  font-size: 0.9rem;
+}
+
+.teacherListItem {
+  align-items: flex-start;
+  gap: 1rem;
+}
+
 .subheading {
   font-weight: 600;
   margin-bottom: 0.5rem;
@@ -171,6 +197,30 @@
 
 .teacherName {
   font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.infoCard {
+  background: white;
+  border-radius: 10px;
+  padding: 0.8rem;
+  box-shadow: inset 0 0 0 1px #eee;
+}
+
+.infoLabel {
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.infoValue {
+  font-size: 1rem;
   font-weight: 700;
 }
 

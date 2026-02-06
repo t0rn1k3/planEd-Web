@@ -1,15 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import styles from "./TimetablePage.module.css";
 import { useTimetableStore } from "@/store/timetableStore";
-import { createEmptyGrid, slotKey, WEEKDAY_LABELS } from "@/lib/timetableUtils";
-
-type AssignmentDraft = {
-  subject: string;
-  classId: string;
-  weeklyLessons: string;
-};
+import { createEmptyGrid, WEEKDAY_LABELS } from "@/lib/timetableUtils";
 
 export default function TimetablePage() {
   const {
@@ -22,10 +17,7 @@ export default function TimetablePage() {
     removeClass,
     addTeacher,
     removeTeacher,
-    addAssignment,
-    removeAssignment,
     updateConfig,
-    toggleUnavailableSlot,
     generateSchedule,
     clearSchedule,
   } = useTimetableStore();
@@ -33,19 +25,12 @@ export default function TimetablePage() {
   const [newClassName, setNewClassName] = useState("");
   const [teacherName, setTeacherName] = useState("");
   const [teacherWeeklyHours, setTeacherWeeklyHours] = useState("");
-  const [assignmentDrafts, setAssignmentDrafts] = useState<
-    Record<string, AssignmentDraft>
-  >({});
 
   const teacherMap = useMemo(
     () => new Map(teachers.map((teacher) => [teacher.id, teacher])),
     [teachers]
   );
 
-  const classMap = useMemo(
-    () => new Map(classes.map((schoolClass) => [schoolClass.id, schoolClass])),
-    [classes]
-  );
 
   const handleAddClass = () => {
     if (!newClassName.trim()) return;
@@ -61,58 +46,6 @@ export default function TimetablePage() {
     setTeacherWeeklyHours("");
   };
 
-  const handleDraftChange = (
-    teacherId: string,
-    field: keyof AssignmentDraft,
-    value: string
-  ) => {
-    const fallbackDraft: AssignmentDraft = {
-      subject: "",
-      classId: classes[0]?.id ?? "",
-      weeklyLessons: "",
-    };
-
-    setAssignmentDrafts((prev) => ({
-      ...prev,
-      [teacherId]: {
-        ...(prev[teacherId] ?? fallbackDraft),
-        [field]: value,
-      },
-    }));
-  };
-
-  const handleAddAssignment = (teacherId: string) => {
-    const draft: AssignmentDraft = assignmentDrafts[teacherId] ?? {
-      subject: "",
-      classId: classes[0]?.id ?? "",
-      weeklyLessons: "",
-    };
-
-    const weeklyLessons = Number(draft.weeklyLessons);
-    if (
-      !draft.subject.trim() ||
-      !draft.classId ||
-      !Number.isFinite(weeklyLessons) ||
-      weeklyLessons <= 0
-    )
-      return;
-
-    addAssignment(teacherId, {
-      subject: draft.subject,
-      classId: draft.classId,
-      weeklyLessons,
-    });
-
-    setAssignmentDrafts((prev) => ({
-      ...prev,
-      [teacherId]: {
-        ...draft,
-        subject: "",
-        weeklyLessons: "",
-      },
-    }));
-  };
-
   const handleBreakChange = (index: number, value: number) => {
     const updated = [...config.breakDurations];
     updated[index] = value;
@@ -125,9 +58,124 @@ export default function TimetablePage() {
     <div className={styles.container}>
       <h1 className={styles.title}>საათობრივი ბადე</h1>
       <p className={styles.subtitle}>
-        შექმენით მასწავლებლებისა და კლასების მონაცემები, შემდეგ ავტომატურად
+        შექმენით მასწავლებლები, შემდეგ თითოეულს შეუვსეთ დეტალები და ბოლოს
         დააგენერირეთ კვირის განრიგი.
       </p>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>მასწავლებლები</h2>
+        <p className={styles.mutedText}>
+          დაამატეთ მასწავლებლები და გახსენით მათი გვერდი დეტალებისთვის.
+        </p>
+        <div className={styles.formRow}>
+          <input
+            className={styles.input}
+            placeholder="მასწავლებლის სახელი"
+            value={teacherName}
+            onChange={(event) => setTeacherName(event.target.value)}
+          />
+          <input
+            className={styles.input}
+            type="number"
+            min={1}
+            placeholder="კვირაში საათები"
+            value={teacherWeeklyHours}
+            onChange={(event) => setTeacherWeeklyHours(event.target.value)}
+          />
+          <button className={styles.button} onClick={handleAddTeacher}>
+            დამატება
+          </button>
+        </div>
+
+        {teachers.length === 0 ? (
+          <p className={styles.mutedText}>
+            მასწავლებლები ჯერ არ არის დამატებული.
+          </p>
+        ) : (
+          <ul className={styles.list}>
+            {teachers.map((teacher) => {
+              const assignmentsTotal = teacher.assignments.reduce(
+                (sum, assignment) => sum + assignment.weeklyLessons,
+                0
+              );
+              const classCount = new Set(
+                teacher.assignments.map((assignment) => assignment.classId)
+              ).size;
+              const subjectCount = new Set(
+                teacher.assignments.map((assignment) =>
+                  assignment.subject.trim().toLowerCase()
+                )
+              ).size;
+
+              return (
+                <li
+                  key={teacher.id}
+                  className={`${styles.listItem} ${styles.teacherListItem}`}
+                >
+                  <div>
+                    <div className={styles.teacherName}>{teacher.name}</div>
+                    <div className={styles.listMeta}>
+                      კვირაში მაქს: {teacher.weeklyHours} | მინიჭებული:{" "}
+                      {assignmentsTotal}
+                    </div>
+                    <div className={styles.listMeta}>
+                      კლასები: {classCount || "—"} | საგნები:{" "}
+                      {subjectCount || "—"}
+                    </div>
+                  </div>
+                  <div className={styles.listActions}>
+                    <Link
+                      className={styles.buttonSecondary}
+                      href={`/timetable/teachers/${teacher.id}`}
+                    >
+                      დეტალები
+                    </Link>
+                    <button
+                      className={styles.buttonDanger}
+                      onClick={() => removeTeacher(teacher.id)}
+                    >
+                      წაშლა
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>კლასები</h2>
+        <div className={styles.formRow}>
+          <input
+            className={styles.input}
+            placeholder="კლასის დასახელება (მაგ. 5ა)"
+            value={newClassName}
+            onChange={(event) => setNewClassName(event.target.value)}
+          />
+          <button className={styles.button} onClick={handleAddClass}>
+            დამატება
+          </button>
+        </div>
+
+        {classes.length === 0 ? (
+          <p className={styles.mutedText}>კლასები ჯერ არ არის დამატებული.</p>
+        ) : (
+          <ul className={styles.list}>
+            {classes.map((schoolClass) => (
+              <li key={schoolClass.id} className={styles.listItem}>
+                <span>{schoolClass.name}</span>
+                <button
+                  className={styles.buttonDanger}
+                  onClick={() => removeClass(schoolClass.id)}
+                >
+                  წაშლა
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>საწყისი პარამეტრები</h2>
@@ -189,242 +237,6 @@ export default function TimetablePage() {
             </div>
           )}
         </div>
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>კლასები</h2>
-        <div className={styles.formRow}>
-          <input
-            className={styles.input}
-            placeholder="კლასის დასახელება (მაგ. 5ა)"
-            value={newClassName}
-            onChange={(event) => setNewClassName(event.target.value)}
-          />
-          <button className={styles.button} onClick={handleAddClass}>
-            დამატება
-          </button>
-        </div>
-
-        {classes.length === 0 ? (
-          <p className={styles.mutedText}>კლასები ჯერ არ არის დამატებული.</p>
-        ) : (
-          <ul className={styles.list}>
-            {classes.map((schoolClass) => (
-              <li key={schoolClass.id} className={styles.listItem}>
-                <span>{schoolClass.name}</span>
-                <button
-                  className={styles.buttonDanger}
-                  onClick={() => removeClass(schoolClass.id)}
-                >
-                  წაშლა
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>მასწავლებლები</h2>
-        <div className={styles.formRow}>
-          <input
-            className={styles.input}
-            placeholder="მასწავლებლის სახელი"
-            value={teacherName}
-            onChange={(event) => setTeacherName(event.target.value)}
-          />
-          <input
-            className={styles.input}
-            type="number"
-            min={1}
-            placeholder="კვირაში საათები"
-            value={teacherWeeklyHours}
-            onChange={(event) => setTeacherWeeklyHours(event.target.value)}
-          />
-          <button className={styles.button} onClick={handleAddTeacher}>
-            დამატება
-          </button>
-        </div>
-
-        {teachers.length === 0 ? (
-          <p className={styles.mutedText}>
-            მასწავლებლები ჯერ არ არის დამატებული.
-          </p>
-        ) : (
-          <div className={styles.teacherGrid}>
-            {teachers.map((teacher) => {
-              const assignmentsTotal = teacher.assignments.reduce(
-                (sum, assignment) => sum + assignment.weeklyLessons,
-                0
-              );
-              const draft: AssignmentDraft = assignmentDrafts[teacher.id] ?? {
-                subject: "",
-                classId: classes[0]?.id ?? "",
-                weeklyLessons: "",
-              };
-
-              return (
-                <div key={teacher.id} className={styles.teacherCard}>
-                  <div className={styles.teacherHeader}>
-                    <div>
-                      <h3 className={styles.teacherName}>{teacher.name}</h3>
-                      <p className={styles.mutedText}>
-                        კვირაში მაქს: {teacher.weeklyHours} | მინიჭებული:{" "}
-                        {assignmentsTotal}
-                      </p>
-                    </div>
-                    <button
-                      className={styles.buttonDanger}
-                      onClick={() => removeTeacher(teacher.id)}
-                    >
-                      წაშლა
-                    </button>
-                  </div>
-
-                  <div className={styles.assignmentForm}>
-                    <input
-                      className={styles.input}
-                      placeholder="საგანი"
-                      value={draft.subject}
-                      onChange={(event) =>
-                        handleDraftChange(
-                          teacher.id,
-                          "subject",
-                          event.target.value
-                        )
-                      }
-                    />
-                    <select
-                      className={styles.select}
-                      value={draft.classId}
-                      onChange={(event) =>
-                        handleDraftChange(
-                          teacher.id,
-                          "classId",
-                          event.target.value
-                        )
-                      }
-                    >
-                      <option value="">კლასი</option>
-                      {classes.map((schoolClass) => (
-                        <option key={schoolClass.id} value={schoolClass.id}>
-                          {schoolClass.name}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      className={styles.input}
-                      type="number"
-                      min={1}
-                      placeholder="კვირაში გაკვეთილები"
-                      value={draft.weeklyLessons}
-                      onChange={(event) =>
-                        handleDraftChange(
-                          teacher.id,
-                          "weeklyLessons",
-                          event.target.value
-                        )
-                      }
-                    />
-                    <button
-                      className={styles.button}
-                      onClick={() => handleAddAssignment(teacher.id)}
-                      disabled={classes.length === 0}
-                    >
-                      დამატება
-                    </button>
-                  </div>
-
-                  {teacher.assignments.length === 0 ? (
-                    <p className={styles.mutedText}>
-                      საგნები ჯერ არ არის დამატებული.
-                    </p>
-                  ) : (
-                    <ul className={styles.assignmentList}>
-                      {teacher.assignments.map((assignment) => (
-                        <li key={assignment.id} className={styles.assignmentRow}>
-                          <div>
-                            <span className={styles.badge}>
-                              {assignment.subject}
-                            </span>
-                            <span className={styles.assignmentMeta}>
-                              {classMap.get(assignment.classId)?.name ??
-                                assignment.classId}
-                              , კვირაში {assignment.weeklyLessons}
-                            </span>
-                          </div>
-                          <button
-                            className={styles.buttonSecondary}
-                            onClick={() =>
-                              removeAssignment(teacher.id, assignment.id)
-                            }
-                          >
-                            წაშლა
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <div className={styles.availability}>
-                    <p className={styles.subheading}>
-                      მიუთითეთ, როდის არ არის ხელმისაწვდომი
-                    </p>
-                    <div className={styles.tableWrapper}>
-                      <table className={styles.availabilityTable}>
-                        <thead>
-                          <tr>
-                            <th>პერიოდი</th>
-                            {WEEKDAY_LABELS.map((label) => (
-                              <th key={label}>{label}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {Array.from({ length: periods }).map((_, period) => (
-                            <tr key={period}>
-                              <td>{period + 1}</td>
-                              {WEEKDAY_LABELS.map((label, dayIndex) => {
-                                const key = slotKey(dayIndex, period);
-                                const isUnavailable =
-                                  teacher.unavailableSlots.includes(key);
-                                return (
-                                  <td
-                                    key={`${label}-${period}`}
-                                    className={
-                                      isUnavailable
-                                        ? styles.unavailableCell
-                                        : undefined
-                                    }
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={isUnavailable}
-                                      onChange={() =>
-                                        toggleUnavailableSlot(
-                                          teacher.id,
-                                          dayIndex,
-                                          period
-                                        )
-                                      }
-                                      aria-label={`${teacher.name} ${label} ${
-                                        period + 1
-                                      }`}
-                                    />
-                                  </td>
-                                );
-                              })}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
       </section>
 
       <section className={styles.section}>
