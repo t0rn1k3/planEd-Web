@@ -102,7 +102,9 @@ export const useTimetableStore = create<TimetableState>((set, get) => ({
   addTeacher: (name, weeklyHours) =>
     set((state) => {
       const trimmed = name.trim();
-      if (!trimmed || weeklyHours <= 0) return state;
+      if (!trimmed || !Number.isFinite(weeklyHours) || weeklyHours < 0) {
+        return state;
+      }
       const exists = state.teachers.some(
         (teacher) => teacher.name.toLowerCase() === trimmed.toLowerCase()
       );

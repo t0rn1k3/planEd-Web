@@ -171,7 +171,9 @@ export default function TeacherDetailPage() {
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
             <div className={styles.infoLabel}>კვირაში ლიმიტი</div>
-            <div className={styles.infoValue}>{teacher.weeklyHours}</div>
+            <div className={styles.infoValue}>
+              {teacher.weeklyHours > 0 ? teacher.weeklyHours : "შეუზღუდავი"}
+            </div>
           </div>
           <div className={styles.infoCard}>
             <div className={styles.infoLabel}>მინიჭებული გაკვეთილები</div>

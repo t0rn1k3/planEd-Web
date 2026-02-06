@@ -39,8 +39,9 @@ export default function TimetablePage() {
   };
 
   const handleAddTeacher = () => {
-    const hours = Number(teacherWeeklyHours);
-    if (!teacherName.trim() || !Number.isFinite(hours) || hours <= 0) return;
+    const hours =
+      teacherWeeklyHours.trim() === "" ? 0 : Number(teacherWeeklyHours);
+    if (!teacherName.trim() || !Number.isFinite(hours) || hours < 0) return;
     addTeacher(teacherName, hours);
     setTeacherName("");
     setTeacherWeeklyHours("");
@@ -77,8 +78,8 @@ export default function TimetablePage() {
           <input
             className={styles.input}
             type="number"
-            min={1}
-            placeholder="კვირაში საათები"
+            min={0}
+            placeholder="კვირაში მაქს. საათები (სურვილისამებრ)"
             value={teacherWeeklyHours}
             onChange={(event) => setTeacherWeeklyHours(event.target.value)}
           />
@@ -115,8 +116,11 @@ export default function TimetablePage() {
                   <div>
                     <div className={styles.teacherName}>{teacher.name}</div>
                     <div className={styles.listMeta}>
-                      კვირაში მაქს: {teacher.weeklyHours} | მინიჭებული:{" "}
-                      {assignmentsTotal}
+                      კვირაში მაქს:{" "}
+                      {teacher.weeklyHours > 0
+                        ? teacher.weeklyHours
+                        : "შეუზღუდავი"}{" "}
+                      | მინიჭებული: {assignmentsTotal}
                     </div>
                     <div className={styles.listMeta}>
                       კლასები: {classCount || "—"} | საგნები:{" "}
