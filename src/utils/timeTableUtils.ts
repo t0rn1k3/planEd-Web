@@ -4,7 +4,6 @@ import {
     TimetableConfig,
     TimetableGrid,
     TimetableSchedule,
-    TimetableSlot,
   } from "@/interfaces/timeTableInterface";
   
   export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"] as const;
